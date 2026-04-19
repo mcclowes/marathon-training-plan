@@ -15,7 +15,7 @@ import {
   focusMarkerClass, getDaysToRace, getRemainingSessions, getTotalSessions
 } from './components.js';
 import store from '../store.js';
-import { isStravaConnected, getStravaAthlete, loadStravaSettings } from '../strava.js';
+import { isStravaConnected, getStravaAthlete } from '../strava.js';
 
 // ===== PACE OPTIONS HELPER =====
 function generatePaceOptions(selected) {
@@ -591,11 +591,38 @@ export function renderDayDetail() {
   `;
 }
 
+// ===== LOGIN =====
+export function renderLogin() {
+  return `
+    <div class="screen" id="screen-login" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;gap:var(--sp-6)">
+      <div>
+        <div style="font-size:2.5rem;font-weight:var(--fw-black);line-height:1.1;margin-bottom:var(--sp-3)">
+          Why TF use <span style="color:var(--c-accent)">Runna</span>?
+        </div>
+        <p style="color:var(--c-text-muted);font-size:var(--fs-sm)">Training plans for the stoke not the followers</p>
+      </div>
+      <button onclick="window.stravaConnect()" style="
+        display:flex;align-items:center;gap:var(--sp-3);
+        background:#FC4C02;color:white;border:none;
+        padding:var(--sp-4) var(--sp-6);border-radius:var(--radius-lg);
+        font-size:var(--fs-base);font-weight:var(--fw-semibold);cursor:pointer;
+        box-shadow:0 4px 14px rgba(252,76,2,0.35)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+          <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+        </svg>
+        Connect with Strava
+      </button>
+      <p style="font-size:var(--fs-xs);color:var(--c-text-muted);max-width:280px;line-height:1.6">
+        Sign in with your Strava account to create and sync your training plans across devices.
+      </p>
+    </div>
+  `;
+}
+
 // ===== SETTINGS =====
 export function renderSettings() {
   const connected = isStravaConnected();
   const athlete = getStravaAthlete();
-  const stravaSettings = loadStravaSettings();
 
   const stravaCard = `
     <div class="card" style="margin-top:var(--sp-6)">
@@ -611,21 +638,18 @@ export function renderSettings() {
         <div id="strava-sync-status" style="margin-top:var(--sp-3);font-size:var(--fs-sm);color:var(--c-text-muted)"></div>
       ` : `
         <p style="font-size:var(--fs-sm);color:var(--c-text-muted);margin-bottom:var(--sp-4)">
-          Connect Strava to automatically mark sessions complete when you log a run.
+          Not connected. Reconnect to sync your activities.
         </p>
-        <div style="display:flex;flex-direction:column;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-          <div>
-            <label style="font-size:var(--fs-sm);font-weight:var(--fw-semibold);display:block;margin-bottom:var(--sp-1)">Client ID</label>
-            <input id="strava-client-id" type="text" class="input" placeholder="From strava.com/settings/api"
-              value="${stravaSettings.clientId || ''}" style="width:100%">
-          </div>
-          <div>
-            <label style="font-size:var(--fs-sm);font-weight:var(--fw-semibold);display:block;margin-bottom:var(--sp-1)">Client Secret</label>
-            <input id="strava-client-secret" type="password" class="input" placeholder="From strava.com/settings/api"
-              value="${stravaSettings.clientSecret || ''}" style="width:100%">
-          </div>
-        </div>
-        <button class="btn btn-sm btn-primary" onclick="window.stravaConnect()">Connect with Strava</button>
+        <button onclick="window.stravaConnect()" style="
+          display:flex;align-items:center;gap:var(--sp-2);
+          background:#FC4C02;color:white;border:none;
+          padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-md);
+          font-size:var(--fs-sm);font-weight:var(--fw-semibold);cursor:pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+          </svg>
+          Reconnect Strava
+        </button>
       `}
     </div>
   `;

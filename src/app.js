@@ -5,9 +5,10 @@
 
 import store from './store.js';
 import { generateTrainingPlan } from '../engine/planGenerator.js';
-import { renderCreateScreen, renderDashboard, renderWeeklyView, renderDayDetail, renderSettings } from './ui/renderers.js';
+import { renderCreateScreen, renderDashboard, renderWeeklyView, renderDayDetail, renderSettings, renderLogin } from './ui/renderers.js';
 import { findCurrentWeek, icon } from './ui/components.js';
-import { handleStravaCallback, stravaConnect as _stravaConnect, saveStravaCredentials, disconnectStrava, syncActivitiesToPlan } from './strava.js';
+import { handleStravaCallback, stravaConnect as _stravaConnect, disconnectStrava, syncActivitiesToPlan, isStravaConnected, getStravaAthlete } from './strava.js';
+import { saveUserProfile, savePlanToFirestore, saveCompletionsToFirestore, loadPlansFromFirestore, deletePlanFromFirestore } from './db.js';
 
 const $app = document.getElementById('app');
 const $nav = document.getElementById('bottom-nav');
@@ -48,19 +49,20 @@ async function loadRaces() {
 function render() {
   let html = '';
   switch (store.currentView) {
+    case 'login': html = renderLogin(); break;
     case 'create': html = renderCreateScreen(); break;
     case 'dashboard': html = renderDashboard(); break;
     case 'weekly': html = renderWeeklyView(); break;
     case 'day': html = renderDayDetail(); break;
     case 'settings': html = renderSettings(); break;
-    default: html = renderCreateScreen();
+    default: html = renderLogin();
   }
   $app.innerHTML = html;
   updateNav();
 }
 
 function updateNav() {
-  if (!store.plan) {
+  if (!store.plan || store.currentView === 'login') {
     $nav.style.display = 'none';
     return;
   }
@@ -316,6 +318,12 @@ window.generatePlan = async function() {
 
     const plan = generateTrainingPlan(input, dataStore);
     store.savePlan(plan, d.email, d.raceName);
+
+    const athlete = getStravaAthlete();
+    if (athlete) {
+      await savePlanToFirestore(athlete.id, store.planId, plan, d.email, d.raceName);
+    }
+
     store.currentView = 'dashboard';
     store.resetDraft();
     render();
@@ -366,9 +374,13 @@ window.openDay = function(dayIdx) {
   window.scrollTo(0, 0);
 };
 
-window.toggleComplete = function(dayIdx) {
+window.toggleComplete = async function(dayIdx) {
   store.toggleCompletion(dayIdx);
   render();
+  const athlete = getStravaAthlete();
+  if (athlete && store.planId) {
+    await saveCompletionsToFirestore(athlete.id, store.planId, store.completions).catch(() => {});
+  }
 };
 
 // ===== SETTINGS ACTIONS =====
@@ -395,26 +407,29 @@ window.importPlan = function(event) {
   reader.readAsText(file);
 };
 
-window.resetPlan = function() {
+window.resetPlan = async function() {
   if (confirm('Are you sure? This will delete your current plan and completion data.')) {
+    const athlete = getStravaAthlete();
+    const planId = store.planId;
     store.clearPlan();
     store.resetDraft();
     store.currentView = 'create';
+    if (athlete && planId) {
+      await deletePlanFromFirestore(athlete.id, planId).catch(() => {});
+    }
     render();
   }
 };
 
 // ===== STRAVA =====
-window.stravaConnect = function() {
-  const clientId = document.getElementById('strava-client-id')?.value.trim();
-  const clientSecret = document.getElementById('strava-client-secret')?.value.trim();
-  if (clientId && clientSecret) saveStravaCredentials(clientId, clientSecret);
-  _stravaConnect();
-};
+window.stravaConnect = _stravaConnect;
 
 window.stravaDisconnect = function() {
-  if (confirm('Disconnect Strava? Your completed sessions will remain.')) {
+  if (confirm('Disconnect Strava? Your plans will remain saved.')) {
     disconnectStrava();
+    store.currentView = 'login';
+    store.plan = null;
+    store.planId = null;
     render();
   }
 };
@@ -423,7 +438,11 @@ window.stravaSync = async function() {
   const statusEl = document.getElementById('strava-sync-status');
   if (statusEl) statusEl.textContent = 'Syncing...';
   try {
-    const newMatches = await syncActivitiesToPlan(store.plan, store.completions, store.toggleCompletion.bind(store));
+    const athlete = getStravaAthlete();
+    const newMatches = await syncActivitiesToPlan(store.plan, store.completions, async (idx) => {
+      store.toggleCompletion(idx);
+      if (athlete) await saveCompletionsToFirestore(athlete.id, store.planId, store.completions);
+    });
     render();
     const el = document.getElementById('strava-sync-status');
     if (el) el.textContent = newMatches > 0 ? `${newMatches} session${newMatches > 1 ? 's' : ''} marked complete.` : 'All up to date.';
@@ -441,15 +460,42 @@ async function init() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('code') && urlParams.get('scope')?.includes('activity')) {
     try {
-      await handleStravaCallback(urlParams.get('code'));
+      const data = await handleStravaCallback(urlParams.get('code'));
       window.history.replaceState({}, '', window.location.pathname);
-      store.currentView = 'settings';
+      await saveUserProfile(data.athlete);
     } catch(e) {
       console.error('Strava auth failed:', e);
     }
   }
 
+  // If not connected, show login screen
+  if (!isStravaConnected()) {
+    store.currentView = 'login';
+    await Promise.all([loadData(), loadRaces()]);
+    render();
+    return;
+  }
+
+  // Connected — load plans from Firestore
   await Promise.all([loadData(), loadRaces()]);
+  try {
+    const athlete = getStravaAthlete();
+    const firestorePlans = await loadPlansFromFirestore(athlete.id);
+    if (firestorePlans.length > 0) {
+      const latest = firestorePlans.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+      store.plan = latest.plan;
+      store.planId = latest.planId;
+      store.completions = latest.completions || {};
+      store.currentView = 'dashboard';
+    } else {
+      store.currentView = 'create';
+    }
+  } catch(e) {
+    console.warn('Firestore load failed, falling back to localStorage:', e);
+    // store.init() already loaded from localStorage above
+    if (!store.plan) store.currentView = 'create';
+  }
+
   render();
 }
 
