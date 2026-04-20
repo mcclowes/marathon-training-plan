@@ -69,10 +69,7 @@ function generateCandidates(count: number): number[][] {
   return results;
 }
 
-export function optimizeBlocks(
-  maxDayCount: number,
-  _lastDate?: Date,
-): BlockInfo {
+export function optimizeBlocks(maxDayCount: number): BlockInfo {
   const daysUntilRace = maxDayCount;
   const taperStartDayIndex = maxDayCount - 17;
 

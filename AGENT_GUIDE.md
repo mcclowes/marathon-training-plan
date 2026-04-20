@@ -1,5 +1,9 @@
 # Flow — Marathon Training App: Developer Guide for Claude Agents
 
+> **Read this first.** This guide describes the **legacy vanilla-JS app at the repo root**. That app is now the *reference implementation*, not the production code path. The production app is the Next.js app in [`/web`](./web) — see `/web/CLAUDE.md` for its stack and layout.
+>
+> This guide is still useful because the training-engine semantics (block optimiser, mileage progression, distance allocation, session selector, pace engine, taper protocol) were ported verbatim into `web/lib/engine/*.ts`. Use the "How to make common changes" matrix below to understand the engine; when making actual production changes, apply them to the TypeScript files under `web/lib/engine/` (and mirror test changes into `web/**/*.spec.ts` under Vitest, not the browser runner).
+
 ## Purpose of this document
 You are a Claude agent being asked to modify the Flow marathon training web app. This guide tells you exactly which files to touch for any given change, what each file does, and what NOT to break. Read this before making any edits.
 
@@ -236,7 +240,7 @@ Strava-related state (`clientId`, `clientSecret`, `accessToken`, `refreshToken`,
 - **Don't rename the 14 session table names** without also updating `getSessionTableName()` in `sessionSelector.js` and `getFinalSessionTableName()`.
 - **Don't change the pace table naming convention** without updating `paceSummary` in `config.json` and the lookup functions in `paceEngine.js`.
 - **Don't use `localStorage` or `sessionStorage` in engine files** — state is managed only by `store.js`.
-- **Don't add frameworks** (React, Vue, etc.) — the app is vanilla JS by design.
+- **Don't add frameworks to this legacy tree** — the root-level app is vanilla JS by design and is now frozen as the reference implementation. Framework code (React/Next.js) belongs in `/web`.
 
 ---
 

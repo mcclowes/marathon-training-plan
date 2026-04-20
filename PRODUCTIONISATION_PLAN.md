@@ -1,5 +1,12 @@
 # Productionisation plan
 
+> **Status: shipped (phases 0–8 complete).** This document is retained for historical context. Two things shifted from the plan during execution and are worth flagging before reading the rest of the doc:
+>
+> - **Auth provider:** the plan below assumes **Clerk**. The implementation shipped with **Auth.js v5 (`next-auth`) using Strava as the sole OAuth provider** (see `web/auth.ts`). Wherever this doc says Clerk / `@clerk/nextjs` / `ClerkProvider` / Clerk `auth()`, the actual code uses the Auth.js equivalent.
+> - **Phase 8 (Firebase decommission)** was added during execution and is not listed below; it removed the old Firebase auth + Firestore plan storage that predated the Next.js port.
+>
+> For the current stack, see `/web/CLAUDE.md`.
+
 Migrating the Marathon Training App from a vanilla-JS, localStorage-only browser app to a multi-user web app on Next.js + Clerk + Vercel Blob.
 
 ## Assumptions challenged up front

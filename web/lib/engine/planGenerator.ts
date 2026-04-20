@@ -70,8 +70,7 @@ export function generateTrainingPlan(
     throw new Error("Race date too close. Need at least 8 weeks.");
   }
 
-  const lastDate = scaffold[scaffold.length - 1].date;
-  const blockInfo = optimizeBlocks(maxDayCount, lastDate);
+  const blockInfo = optimizeBlocks(maxDayCount);
   const { blocks, planBlockCount, taperStartDayIndex, planBlockLength } =
     blockInfo;
 

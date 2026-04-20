@@ -1,14 +1,15 @@
-# Flow — web app (Next.js port)
+# Flow — web app (Next.js production build)
 
-This directory is the Next.js + Vercel port of the marathon training app. The vanilla-JS app in the repo root keeps working until Phase 4 lands (see `/PRODUCTIONISATION_PLAN.md`).
+This directory is the production Next.js app. The vanilla-JS app at the repo root is retained as the reference implementation; see root `CLAUDE.md` and `AGENT_GUIDE.md`. The migration (phases 0–8) is complete — Firebase has been decommissioned.
 
 ## Stack
 
 - Next.js 16 (App Router) + React 19
-- Auth.js v5 (`next-auth`) with Strava as the sole OAuth provider (`web/auth.ts`)
-- Vercel Blob for plan storage (`@vercel/blob`) — wired in Phase 2
+- Auth.js v5 (`next-auth`), Strava as the sole OAuth provider (see `web/auth.ts`)
+- Vercel Blob for plan / completions / strava-token storage (`@vercel/blob`)
 - SCSS modules for styling
-- Vitest for tests
+- Vitest for unit tests, Playwright for e2e smoke
+- Zod for storage-layer schema validation
 
 ## Getting started
 
@@ -18,6 +19,7 @@ cp .env.example .env.local   # fill in STRAVA_CLIENT_ID/SECRET + AUTH_SECRET
 pnpm dev
 pnpm test
 pnpm typecheck
+pnpm test:e2e
 pnpm build
 ```
 
@@ -28,20 +30,44 @@ Strava redirect URI in the Strava app settings: `http://localhost:3000/api/auth/
 
 ```
 app/
-├── layout.tsx           Root layout + metadata
-├── page.tsx             Landing (connect-Strava CTA)
-├── dashboard/page.tsx   Protected placeholder (Phase 3/4 will replace)
-└── api/auth/[...nextauth]/route.ts   Auth.js handlers
-auth.ts                  NextAuth config (Strava provider + session shape)
-middleware.ts            Auth guard for /dashboard and /plans
-types/next-auth.d.ts     Session.user.athleteId + JWT token shape
+├── layout.tsx                         Root layout + metadata
+├── page.tsx                           Landing (connect-Strava CTA)
+├── (app)/                             Authed routes group
+├── actions/                           'use server' mutations (plans, completions, strava)
+├── api/auth/[...nextauth]/route.ts    Auth.js handlers
+└── globals.scss                       Global styles + tokens
+auth.ts                                NextAuth config (Strava provider + session shape)
+middleware.ts                          Auth guard
+types/next-auth.d.ts                   Session.user.athleteId + JWT token shape
+components/
+├── plan/                              Plan grid, week row, day cell, day detail modal
+└── shell/                             App shell / layout components
 lib/
-├── engine/              Phase 1 — TS port of ../engine/*.js
-├── storage/             Phase 2 — Vercel Blob wrappers
-└── strava/              Phase 5 — Server-side sync
-tests/                   Vitest specs
+├── auth/                              Auth helpers
+├── engine/                            TS port of the training engine (pure, no IO)
+├── data/                              sessionTemplates.json / paceTables.json / config.json
+├── storage/                           Vercel Blob wrappers (typed + Zod-validated)
+├── strava/                            Server-side OAuth + activity sync
+└── migrate/                           One-shot legacy-localStorage import
+e2e/                                   Playwright specs
 ```
+
+## Blob key scheme
+
+- `users/{userId}/plans/{planId}.json` — full generated plan
+- `users/{userId}/plans-index.json` — list/metadata only
+- `users/{userId}/completions/{planId}.json`
+- `users/{userId}/strava.json` — tokens (server-only reads; browser never sees them)
+
+Uses `addRandomSuffix: false` + `allowOverwrite: true` for stable keys. No optimistic concurrency — single-user-per-account means last-write-wins is acceptable.
 
 ## Do-not-break contracts (carry forward from root `CLAUDE.md`)
 
-When Phase 1 lands, the ported TS engine must preserve the same load-bearing JSON property names as the legacy engine: `Session Distance`, `Total Distance`, `Upper`, `Lower`, `UppeDif`, `LowerDif`, `Rep 1`…`Rep N`, the 14 session table names, and the `{Type}_Paces_{Style}_{MarathonTime}` pace-table naming convention. Type them, do not rename them.
+The ported engine preserves the same load-bearing JSON property names as the legacy engine: `Session Distance`, `Total Distance`, `Upper`, `Lower`, `UppeDif`, `LowerDif`, `Rep 1`…`Rep N`, the 14 session table names, and the `{Type}_Paces_{Style}_{MarathonTime}` pace-table naming convention. Type them — do not rename them. Units are the same: distances in **metres**, paces in **seconds**; the UI divides by 1000 for km display.
+
+## Architectural rules
+
+- **Engine stays pure.** `lib/engine/*` must not import from `app/`, `components/`, or any storage/auth module. Data in → data out. Tests live alongside as `*.spec.ts`.
+- **Reads in Server Components, writes via server actions.** Use `auth()` in server code for `userId`; never pass it as a prop.
+- **Tokens never touch the browser.** Strava access + refresh tokens are stored in Blob and read only by `lib/strava/*` and `app/actions/strava.ts`.
+- **Zod-validate on read.** Any `getJson<T>(key)` path goes through a schema; this guards against Blob drift.
