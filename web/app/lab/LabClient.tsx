@@ -11,6 +11,11 @@ import {
 } from "@/lib/engine";
 import styles from "./lab.module.scss";
 import { Visualisations } from "./Visualisations";
+import {
+  buildMarkdownExport,
+  downloadMarkdown,
+  exportFilename,
+} from "./exportMarkdown";
 
 type Style = GeneratePlanInput["style"];
 
@@ -73,6 +78,12 @@ export function LabClient() {
 
   function resetAll() {
     setState(DEFAULT_STATE);
+  }
+
+  function exportMd() {
+    if (!result.ok) return;
+    const md = buildMarkdownExport(result.plan, state.input, state.tuning);
+    downloadMarkdown(exportFilename(state.input), md);
   }
 
   const plan = result.ok ? result.plan : null;
@@ -362,6 +373,14 @@ export function LabClient() {
         </Section>
 
         <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.actionPrimary}
+            onClick={exportMd}
+            disabled={!result.ok}
+          >
+            Export .md
+          </button>
           <button type="button" className={styles.actionSecondary} onClick={resetTuning}>
             Reset tuning
           </button>

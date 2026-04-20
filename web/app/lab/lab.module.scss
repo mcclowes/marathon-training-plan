@@ -288,6 +288,7 @@
   border-top: 1px solid var(--c-border);
 }
 
+.actionPrimary,
 .actionSecondary,
 .actionGhost {
   font: inherit;
@@ -298,6 +299,22 @@
   padding: 9px 14px;
   border-radius: var(--r-sm);
   transition: all var(--tr-fast);
+}
+
+.actionPrimary {
+  background: var(--c-text);
+  color: var(--c-bg);
+  border: 1px solid var(--c-text);
+
+  &:hover:not(:disabled) {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }
 
 .actionSecondary {
