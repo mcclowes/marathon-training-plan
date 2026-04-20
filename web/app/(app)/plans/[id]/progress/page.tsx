@@ -55,7 +55,16 @@ export default async function PlanProgressPage({ params }: Props) {
         />
       </div>
 
-      <ProgressView view={view} planId={id} />
+      <ProgressView view={view} planId={id}>
+        <ProgressView.Hero />
+        <ProgressView.Status />
+        <ProgressView.Stats />
+        <ProgressView.WeeklyMileage />
+        <ProgressView.SessionLog />
+        <ProgressView.TrainingMix />
+        <ProgressView.UpNext />
+        <ProgressView.Footer />
+      </ProgressView>
     </>
   );
 }
