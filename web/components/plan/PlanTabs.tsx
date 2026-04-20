@@ -1,13 +1,20 @@
 import Link from "next/link";
 import styles from "./PlanTabs.module.scss";
 
-export type PlanTab = "plan" | "progress" | "activities";
+export type PlanTab = "summary" | "plan" | "progress" | "activities";
 
 export function PlanTabs({ planId, active }: { planId: string; active: PlanTab }) {
   return (
     <nav className={styles.tabs} aria-label="Plan sections">
       <Link
         href={`/plans/${planId}`}
+        className={`${styles.tab} ${active === "summary" ? styles.active : ""}`}
+        aria-current={active === "summary" ? "page" : undefined}
+      >
+        Summary
+      </Link>
+      <Link
+        href={`/plans/${planId}/plan`}
         className={`${styles.tab} ${active === "plan" ? styles.active : ""}`}
         aria-current={active === "plan" ? "page" : undefined}
       >
