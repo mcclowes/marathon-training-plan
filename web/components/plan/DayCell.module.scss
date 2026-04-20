@@ -1,0 +1,115 @@
+.cell {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--tr-fast), border-color var(--tr-fast);
+
+  &:hover {
+    background: var(--c-bg-card-hover);
+    border-color: var(--c-border);
+  }
+
+  &.today {
+    background: linear-gradient(135deg, #ffffff, rgba(90, 122, 58, 0.08));
+    border-color: var(--c-accent);
+  }
+
+  &.done {
+    opacity: 0.55;
+
+    .summary {
+      text-decoration: line-through;
+    }
+  }
+
+  &.rest {
+    opacity: 0.75;
+  }
+}
+
+.dayStrip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-right: 1px solid var(--c-border);
+  padding-right: var(--sp-3);
+
+  .abbr {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--fs-md);
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+
+  .date {
+    font-size: var(--fs-xs);
+    color: var(--c-text-dim);
+    margin-top: 2px;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  .summary {
+    font-size: var(--fs-sm);
+    color: var(--c-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .meta {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+}
+
+.distance {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  color: var(--c-text);
+
+  small {
+    font-size: 0.6rem;
+    font-weight: var(--fw-normal);
+    color: var(--c-text-dim);
+    margin-left: 2px;
+  }
+}
+
+.check {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-full);
+  border: 2px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.checked {
+    border-color: var(--c-success);
+    background: var(--c-success);
+    color: #fff;
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}

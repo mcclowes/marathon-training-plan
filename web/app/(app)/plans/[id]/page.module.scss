@@ -1,0 +1,70 @@
+.hero {
+  padding: var(--sp-5);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, #ffffff, rgba(90, 122, 58, 0.05));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.topLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.raceDate {
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-3);
+}
+
+.metaTile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  dt {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-text-dim);
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-md);
+  }
+}
+
+.sectionTitle {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-text-dim);
+  margin-top: var(--sp-2);
+}
+
+@media (max-width: 420px) {
+  .meta {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: var(--sp-4);
+  }
+}
