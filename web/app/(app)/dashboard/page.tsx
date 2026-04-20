@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { MigrationBanner } from "@/components/shell/MigrationBanner";
-import { requireUserId } from "@/lib/auth/session";
 import { listPlans } from "@/lib/storage/plans";
 import styles from "./page.module.scss";
 
@@ -23,7 +22,8 @@ function fmtDate(iso: string): string {
 
 export default async function DashboardPage() {
   const session = await auth();
-  const userId = await requireUserId();
+  const userId = session?.user?.athleteId;
+  if (!userId) throw new Error("Unauthorized — no signed-in user");
   const plans = await listPlans(userId);
 
   const sorted = [...plans].sort((a, b) => a.raceDate.localeCompare(b.raceDate));

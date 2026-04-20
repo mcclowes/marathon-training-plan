@@ -1,6 +1,6 @@
 # Flow — web app (Next.js production build)
 
-This directory is the production Next.js app. The vanilla-JS app at the repo root is retained as the reference implementation; see root `CLAUDE.md` and `AGENT_GUIDE.md`. The migration (phases 0–8) is complete — Firebase has been decommissioned.
+This directory is the production Next.js app. The legacy vanilla-JS reference implementation that previously lived at the repo root has been deleted — the engine is fully ported to TypeScript under `lib/engine/`. See the `legacy-reference-snapshot` git tag if you ever need the original sources.
 
 ## Stack
 
@@ -37,7 +37,7 @@ app/
 ├── api/auth/[...nextauth]/route.ts    Auth.js handlers
 └── globals.scss                       Global styles + tokens
 auth.ts                                NextAuth config (Strava provider + session shape)
-middleware.ts                          Auth guard
+proxy.ts                               Auth guard (Next.js renamed middleware → proxy)
 types/next-auth.d.ts                   Session.user.athleteId + JWT token shape
 components/
 ├── plan/                              Plan grid, week row, day cell, day detail modal
@@ -61,9 +61,9 @@ e2e/                                   Playwright specs
 
 Uses `addRandomSuffix: false` + `allowOverwrite: true` for stable keys. No optimistic concurrency — single-user-per-account means last-write-wins is acceptable.
 
-## Do-not-break contracts (carry forward from root `CLAUDE.md`)
+## Do-not-break contracts
 
-The ported engine preserves the same load-bearing JSON property names as the legacy engine: `Session Distance`, `Total Distance`, `Upper`, `Lower`, `UppeDif`, `LowerDif`, `Rep 1`…`Rep N`, the 14 session table names, and the `{Type}_Paces_{Style}_{MarathonTime}` pace-table naming convention. Type them — do not rename them. Units are the same: distances in **metres**, paces in **seconds**; the UI divides by 1000 for km display.
+The engine preserves load-bearing JSON property names that come straight from the source workbook: `Session Distance`, `Total Distance`, `Upper`, `Lower`, `UppeDif`, `LowerDif`, `Rep 1`…`Rep N`, the 14 session table names (see `lib/engine/sessionSelector.ts`), and the `{Type}_Paces_{Style}_{MarathonTime}` pace-table naming convention. Type them — do not rename them. Distances are in **metres**, paces in **seconds**; the UI divides by 1000 for km display.
 
 ## Architectural rules
 
