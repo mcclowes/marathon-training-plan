@@ -163,3 +163,9 @@
     color: var(--c-text);
   }
 }
+
+.emptyArt {
+  width: min(260px, 60%);
+  height: auto;
+  margin-bottom: var(--sp-2);
+}

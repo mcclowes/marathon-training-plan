@@ -12,6 +12,10 @@ export default async function LandingPage() {
 
   return (
     <main className={styles.main}>
+      <figure className={styles.illustration} aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/illustrations/undraw_running-wild_jnn2.svg" alt="" />
+      </figure>
       <section className={styles.hero}>
         <div className={styles.mark}>
           Flow<span>.</span>

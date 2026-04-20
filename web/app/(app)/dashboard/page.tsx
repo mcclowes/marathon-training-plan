@@ -51,6 +51,12 @@ export default async function DashboardPage() {
         </dl>
       ) : (
         <div className={styles.empty}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/illustrations/undraw_runner-start_585j.svg"
+            alt=""
+            className={styles.emptyArt}
+          />
           <h2>No races on the horizon</h2>
           <p>Start by building a plan from your next race date.</p>
           <Link href="/plans/new" className={styles.cta}>
@@ -88,6 +94,7 @@ export default async function DashboardPage() {
           </Link>
         </>
       )}
+
     </>
   );
 }

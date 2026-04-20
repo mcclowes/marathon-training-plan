@@ -79,6 +79,12 @@ export default function MigratePage() {
           <h1>Migrate plans</h1>
         </header>
         <div className={styles.empty}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/illustrations/undraw_fitness-stats_bd09.svg"
+            alt=""
+            className={styles.emptyArt}
+          />
           <h2>Nothing to migrate</h2>
           <p>This browser has no legacy plans to import.</p>
           <Link href="/dashboard" className={styles.secondary}>
