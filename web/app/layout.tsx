@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { dmSans, jetbrainsMono, outfit } from "./fonts";
 import "./globals.scss";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body>
         {children}
         {modal}
+        <Analytics />
       </body>
     </html>
   );

@@ -30,25 +30,38 @@ Strava redirect URI in the Strava app settings: `http://localhost:3000/api/auth/
 
 ```
 app/
-├── layout.tsx                         Root layout + metadata
-├── page.tsx                           Landing (connect-Strava CTA)
-├── (app)/                             Authed routes group
-├── actions/                           'use server' mutations (plans, completions, strava)
+├── layout.tsx                         Root layout + metadata + parallel-route `modal` slot
+├── page.tsx                           Landing (Watto hero + connect-Strava CTA)
+├── onboarding/                        Guided race/pace/mileage setup → creates first plan
+├── (app)/                             Authed routes group (AppShell w/ BottomNav + MigrationBanner)
+│   ├── dashboard/                     Active-plan summary / plan picker
+│   ├── plans/new/                     PlanForm (manual create)
+│   ├── plans/[id]/                    Plan grid (week-by-week calendar)
+│   │   ├── progress/                  Block timeline, focus donut, mileage chart, key sessions
+│   │   ├── activities/                Synced Strava activities list
+│   │   ├── day/[date]/                Full-page day detail (deep link)
+│   │   └── @modal/(.)day/[date]/      Intercepting route — same day detail as a modal overlay
+│   ├── account/                       Strava connection + account actions
+│   └── migrate/                       One-shot legacy-localStorage import
+├── actions/                           'use server' mutations (auth, plans, completions, strava, migrate)
 ├── api/auth/[...nextauth]/route.ts    Auth.js handlers
-└── globals.scss                       Global styles + tokens
+└── globals.scss + _tokens.scss        Global styles + design tokens
 auth.ts                                NextAuth config (Strava provider + session shape)
 proxy.ts                               Auth guard (Next.js renamed middleware → proxy)
 types/next-auth.d.ts                   Session.user.athleteId + JWT token shape
 components/
-├── plan/                              Plan grid, week row, day cell, day detail modal
-└── shell/                             App shell / layout components
+├── plan/                              Plan grid, week row, day cell, day detail modal, plan actions
+├── progress/                          Progress view widgets (timeline, donut, charts, status)
+├── activities/                        Strava activities list
+└── shell/                             AppShell, BottomNav, AccountSection, MigrationBanner
 lib/
-├── auth/                              Auth helpers
+├── auth/                              Session helpers (requires auth() userId)
 ├── engine/                            TS port of the training engine (pure, no IO)
-├── data/                              sessionTemplates.json / paceTables.json / config.json
+├── data/                              sessionTemplates.json / paceTables.json / config.json / races.json
 ├── storage/                           Vercel Blob wrappers (typed + Zod-validated)
-├── strava/                            Server-side OAuth + activity sync
-└── migrate/                           One-shot legacy-localStorage import
+├── strava/                            Server-side token refresh + activity sync
+├── progress/                          buildProgressView — derives progress widgets from plan + completions
+└── migrate/                           One-shot legacy-localStorage import helpers
 e2e/                                   Playwright specs
 ```
 
