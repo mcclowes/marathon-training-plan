@@ -1,3 +1,13 @@
+/**
+ * ---
+ * purpose: Pick the best pyramidal/uniform block layout (sizes 8/10/12 weeks) to fit days-until-race, scoring against slack + block-count bonuses.
+ * outputs:
+ *   - BlockInfo - blocks, planBlockCount, slackDays, taperStartDayIndex, planBlockLength
+ * related:
+ *   - ./planGenerator.ts - consumes BlockInfo to drive week iteration
+ *   - ./tuning.ts - TuningParams.blockSizes / slackTarget / pyramidalBonus
+ * ---
+ */
 import type { Block, BlockInfo } from "./types";
 import { DEFAULT_TUNING, type TuningParams } from "./tuning";
 

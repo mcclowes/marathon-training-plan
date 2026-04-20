@@ -1,3 +1,15 @@
+/**
+ * ---
+ * purpose: Pace arithmetic + guidance strings. Converts pace strings to seconds, picks the starting pace-index bracket from config, schedules uplift days, loads per-style pace tables, and emits human-readable pace lines per session description.
+ * outputs:
+ *   - string - joined pace guidance lines for a day (via buildPaceGuidance)
+ *   - number / PaceRow[] / table names - helpers for planGenerator loop
+ * related:
+ *   - ./planGenerator.ts - calls findPaceIndex + calculatePaceUplift once, buildPaceGuidance per day
+ *   - ./types.ts - Config / PaceTables / PaceRow / PaceStyle
+ *   - ../data/index.ts - paceTables.json / config.json source data
+ * ---
+ */
 import type {
   Config,
   FocusArea,

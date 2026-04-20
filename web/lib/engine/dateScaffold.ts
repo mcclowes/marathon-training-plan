@@ -1,3 +1,13 @@
+/**
+ * ---
+ * purpose: Build an array of ScaffoldDays from the next Monday after start through race date; provides the day-by-day calendar the engine iterates over.
+ * outputs:
+ *   - ScaffoldDay[] - one entry per training day with dayCount, date, dayOfWeek, dateStr, weekDay
+ * related:
+ *   - ./planGenerator.ts - first call in the pipeline; determines maxDayCount
+ *   - ./types.ts - ScaffoldDay / DayOfWeek
+ * ---
+ */
 import type { DayOfWeek, ScaffoldDay } from "./types";
 
 const DAY_NAMES: DayOfWeek[] = [

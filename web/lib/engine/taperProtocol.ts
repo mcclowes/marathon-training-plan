@@ -1,3 +1,15 @@
+/**
+ * ---
+ * purpose: Hard-coded taper override for the final ~17 days. Maps offset-from-race-day to rest / long run / speed / tempo / shakeout / race-day sessions. Overrides the normal block pipeline.
+ * outputs:
+ *   - boolean - isTaperDay check
+ *   - TaperSession | null - preset session (some mark useFinalSelection so planGenerator re-picks a concrete row)
+ * related:
+ *   - ./planGenerator.ts - branches on isTaperDay before normal day assignment
+ *   - ./sessionSelector.ts - called when useFinalSelection is true
+ *   - ./tuning.ts - taperDays (default 17)
+ * ---
+ */
 import type { TaperSession } from "./types";
 import { DEFAULT_TUNING, type TuningParams } from "./tuning";
 

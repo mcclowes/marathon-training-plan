@@ -1,3 +1,22 @@
+/**
+ * ---
+ * purpose: Top-level engine entry — scaffolds dates, optimizes blocks, projects mileage, then per day picks focus / session / paces / taper override to produce the full GeneratedPlan. Pure (no IO).
+ * inputs:
+ *   - GeneratePlanInput - raceDate, sessionsPerWeek, current/target mileage & pace, style
+ *   - DataStore - sessionTemplates / paceTables / config (from lib/data)
+ * outputs:
+ *   - GeneratedPlan - { planMeta, days, weeks }
+ * related:
+ *   - ./blockOptimizer.ts - picks block layout
+ *   - ./mileageProgression.ts - weekly mileage curve
+ *   - ./distanceAllocation.ts - per-week long/intensity/base split
+ *   - ./sessionSelector.ts - picks concrete session from template table
+ *   - ./weeklySchedule.ts - day-of-week focus + rest-day copy
+ *   - ./taperProtocol.ts - last 17 days override the normal pipeline
+ *   - ./paceEngine.ts - pace-uplift schedule + per-session guidance
+ *   - ./tuning.ts - TuningParams used throughout
+ * ---
+ */
 import { createDateScaffold } from "./dateScaffold";
 import { optimizeBlocks } from "./blockOptimizer";
 import { progressWeeklyMileageByBlocks } from "./mileageProgression";

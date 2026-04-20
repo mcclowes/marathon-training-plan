@@ -1,6 +1,13 @@
 /**
- * Helpers for reading the legacy vanilla-JS app's localStorage shape.
- * Browser-only — don't import from server code.
+ * ---
+ * purpose: One-shot legacy-localStorage import helpers for the pre-Next.js vanilla-JS app. Reads both the multi-plan index shape and the older single-plan shape, then clears them on successful migration. Browser-only — never import from server code.
+ * outputs:
+ *   - readLegacyPayloads - LegacyPayload[] (plan + completions per entry)
+ *   - clearLegacyStorage / hasLegacyData
+ * related:
+ *   - app/(app)/migrate/ - UI that calls these
+ *   - components/shell/MigrationBanner - shows when hasLegacyData is true
+ * ---
  */
 
 export const PLAN_INDEX_KEY = "marathon-plans-index";

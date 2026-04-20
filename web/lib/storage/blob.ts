@@ -1,14 +1,16 @@
+/**
+ * ---
+ * purpose: Low-level typed JSON wrappers over @vercel/blob. Private store (R/W token required to read), stable pathnames, Zod-validated on read. No optimistic concurrency — last-write-wins is acceptable for single-user-per-account.
+ * outputs:
+ *   - getJson<T> / putJson<T> / deleteByKey / listUnderPrefix
+ * related:
+ *   - ./keys.ts - pathname builders consumed here
+ *   - ./schemas.ts - Zod schemas passed to getJson
+ *   - ./plans.ts ./completions.ts ./strava.ts - the three domain wrappers that use these helpers
+ * ---
+ */
 import { BlobNotFoundError, del, get, list, put } from "@vercel/blob";
 import type { ZodType } from "zod";
-
-/**
- * Low-level typed JSON wrappers over @vercel/blob.
- *
- * Uses a private store — blobs require the R/W token to read. Pathnames are
- * stable (addRandomSuffix: false, allowOverwrite: true) so the pathname *is*
- * the lookup key. Blob has no native If-Match; for the single-user-per-account
- * shape of this product we accept last-write-wins.
- */
 
 const JSON_CONTENT_TYPE = "application/json";
 

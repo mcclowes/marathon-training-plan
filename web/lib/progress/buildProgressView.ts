@@ -1,3 +1,15 @@
+/**
+ * ---
+ * purpose: Derive progress-view widgets from a StoredPlan + Completions. Computes per-week actual/planned km, flags past/skipped/done days, detects peak/deload weeks, and classifies overall scenario (ahead/ontrack/behind) from past-week ratio.
+ * outputs:
+ *   - ProgressView - planMeta, today, nowWeek, scenario, weeks[ProgressWeek]
+ *   - FOCUS_COLORS - shared colour palette for focus areas
+ *   - focusKeyOf - FocusArea string → canonical FocusKey
+ * related:
+ *   - app/(app)/plans/[id]/progress/ - only consumer; renders timeline/donut/charts from this view
+ *   - ../storage/schemas.ts - StoredPlan / Completions inputs
+ * ---
+ */
 import type { StoredPlan, Completions } from "@/lib/storage/schemas";
 
 export type Scenario = "ontrack" | "behind" | "ahead";

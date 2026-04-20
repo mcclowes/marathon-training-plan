@@ -1,3 +1,15 @@
+/**
+ * ---
+ * purpose: Resolve which session-template table to sample for (sessionType, weekInBlock, blockLength) and randomly pick a row whose "Session Distance" is within tolerance of the target. Uses Math.random() (non-deterministic — pace with VBA diverges).
+ * outputs:
+ *   - string - table name (e.g. "Speed_EvenBlocks", "Tempo_CutDown")
+ *   - SelectedSession | null - chosen row mapped to engine shape (summary, description, reps, distances)
+ * related:
+ *   - ./planGenerator.ts - caller for both normal + taper final-session paths
+ *   - ./taperProtocol.ts - uses getFinalSessionTableName for taper intensity picks
+ *   - ../data/sessionTemplates.json - the 14 tables named here (do-not-break contract)
+ * ---
+ */
 import type {
   SelectedSession,
   SessionTemplateRow,

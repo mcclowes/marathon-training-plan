@@ -1,3 +1,14 @@
+/**
+ * ---
+ * purpose: Zod schemas for everything that round-trips through Vercel Blob. Mirror engine output shapes with .passthrough() so extra legacy fields survive. Every getJson call goes through a schema here — this is the safety net against blob drift.
+ * outputs:
+ *   - StoredPlanSchema / PlanIndexSchema / CompletionsSchema / StravaTokensSchema (+ inferred types)
+ * related:
+ *   - ./blob.ts - consumer via getJson<T>
+ *   - ./plans.ts ./completions.ts ./strava.ts - domain wrappers
+ *   - ../engine/types.ts - typescript mirror of the runtime shapes validated here
+ * ---
+ */
 import { z } from "zod";
 
 export const PlanDaySchema = z

@@ -1,3 +1,14 @@
+/**
+ * ---
+ * purpose: Project week-by-week mileage across all blocks — ramp weeks grow geometrically up to the block's achievable peak, then 2 deload weeks step down before the next block starts.
+ * outputs:
+ *   - WeeklyMileage[] - flat list across all blocks with weekMileage, isDeload, isPeak, blockIndex, weekInBlock, blockMaxMileage
+ * related:
+ *   - ./planGenerator.ts - called after optimizeBlocks to produce the mileage curve
+ *   - ./blockOptimizer.ts - supplies the Block shape consumed here
+ *   - ./tuning.ts - weeklyGrowthCap / perWeekGrowthCeiling / peakWeeksPerBlock / deload1Factor / deload2Factor
+ * ---
+ */
 import type { Block, WeeklyMileage } from "./types";
 import { DEFAULT_TUNING, type TuningParams } from "./tuning";
 

@@ -1,3 +1,15 @@
+/**
+ * ---
+ * purpose: Server-side Strava client. Transparently refreshes tokens within a 60s window (persisting the new pair to Blob), then fetches run activities since a given ISO date. Tokens never reach the browser — this module is server-only.
+ * outputs:
+ *   - getValidAccessToken - string | null (null = user never connected Strava)
+ *   - fetchRunActivitiesSince - StravaActivity[] (Run type only, up to 200)
+ * related:
+ *   - ../storage/strava.ts - token persistence
+ *   - ../storage/schemas.ts - StravaTokens schema
+ *   - app/actions/strava.ts - server action caller
+ * ---
+ */
 import { z } from "zod";
 import {
   getStravaTokens,

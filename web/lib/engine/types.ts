@@ -1,6 +1,16 @@
 /**
- * Engine types. Property names mirror legacy JSON exactly and must not be
- * renamed (see root CLAUDE.md "Do-not-break contracts").
+ * ---
+ * purpose: All engine-facing types. Property names (Session Distance, Total Distance, Upper/Lower/UppeDif/LowerDif, Rep N) mirror legacy JSON verbatim — do-not-break contract (see root CLAUDE.md). Distances in metres, paces in seconds.
+ * outputs:
+ *   - GeneratedPlan / PlanDay / PlanWeek / PlanMeta - engine output shapes
+ *   - GeneratePlanInput / DataStore - engine input shapes
+ *   - SessionTemplates / PaceTables / Config - JSON data shapes
+ *   - Block / BlockInfo / WeeklyMileage / DistanceAllocation / DayAssignment / TaperSession - intermediate
+ *   - FocusArea / SessionType / PaceStyle / DayOfWeek - enums
+ * related:
+ *   - ./planGenerator.ts - produces GeneratedPlan
+ *   - ../storage/schemas.ts - Zod schemas that mirror these shapes for Blob reads
+ * ---
  */
 
 export type DayOfWeek =

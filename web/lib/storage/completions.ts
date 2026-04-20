@@ -1,3 +1,15 @@
+/**
+ * ---
+ * purpose: Per-plan day-completion tracking. Stored at users/{userId}/completions/{planId}.json as a date-string → ISO-timestamp map. Toggle mutates in place.
+ * outputs:
+ *   - getCompletions / saveCompletions / toggleDayComplete
+ * related:
+ *   - ./blob.ts - underlying I/O
+ *   - ./schemas.ts - CompletionsSchema
+ *   - ../progress/buildProgressView.ts - consumer of completions
+ *   - app/actions/completions.ts - server action caller
+ * ---
+ */
 import { getJson, putJson } from "./blob";
 import { completionsKey } from "./keys";
 import { CompletionsSchema, type Completions } from "./schemas";

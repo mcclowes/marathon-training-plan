@@ -1,3 +1,14 @@
+/**
+ * ---
+ * purpose: Assign a focus area / session type to each day-of-week given block position and sessions-count — encodes the Mon rest, Tue speed, Wed recovery (5+), Thu SE/tempo (4+), Fri rest, Sat base (4+), Sun long run template, with Tuesday/Thursday focus shifting by block.
+ * outputs:
+ *   - DayAssignment - focusArea + either fixed session copy or needsSessionSelection flag
+ *   - { warmUp, warmDown } - distance-based warmup scaling (getWarmUpDown)
+ * related:
+ *   - ./planGenerator.ts - only caller; consumes DayAssignment per day
+ *   - ./types.ts - DayAssignment / FocusArea / SessionType
+ * ---
+ */
 import type {
   DayAssignment,
   DayOfWeek,

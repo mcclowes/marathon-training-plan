@@ -1,7 +1,12 @@
 /**
- * Tuning knobs extracted from planGenerator / mileageProgression / blockOptimizer
- * / distanceAllocation / taperProtocol / paceEngine. Defaults MUST match the
- * values that were previously hard-coded — existing tests pin this behaviour.
+ * ---
+ * purpose: Single source of truth for engine tuning knobs. Every engine module accepts TuningParams and falls back to DEFAULT_TUNING. Values pinned by tests — changing defaults changes generated plans.
+ * outputs:
+ *   - TuningParams (type) / DEFAULT_TUNING (values) / mergeTuning (overlay helper)
+ * related:
+ *   - ./planGenerator.ts + every other engine module - consume TuningParams
+ *   - app/lab/ - UI that mutates tuning and re-runs generation
+ * ---
  */
 
 export interface TuningParams {

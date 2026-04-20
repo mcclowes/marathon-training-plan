@@ -1,3 +1,16 @@
+/**
+ * ---
+ * purpose: Plan CRUD over Vercel Blob. Full plan lives at users/{userId}/plans/{planId}.json; lightweight index at users/{userId}/plans-index.json is kept in sync on save/delete for dashboard listing.
+ * outputs:
+ *   - listPlans - PlanIndexEntry[] (lightweight)
+ *   - getPlan / savePlan / deletePlan - full plan CRUD
+ * related:
+ *   - ./blob.ts - underlying I/O
+ *   - ./schemas.ts - StoredPlanSchema / PlanIndexSchema
+ *   - app/actions/plans.ts - server action caller
+ *   - app/(app)/dashboard - uses listPlans
+ * ---
+ */
 import { deleteByKey, getJson, putJson } from "./blob";
 import { planIndexKey, planKey } from "./keys";
 import {
