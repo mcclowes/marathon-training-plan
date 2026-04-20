@@ -89,3 +89,17 @@ export const CompletionsSchema = z.object({
   completed: z.record(z.string(), z.string()),
 });
 export type Completions = z.infer<typeof CompletionsSchema>;
+
+/**
+ * Strava OAuth tokens — stored server-side only (blob). Never serialised into
+ * the JWT, never sent to the client. `expiresAt` is UNIX seconds per Strava's
+ * API; we refresh 60s early.
+ */
+export const StravaTokensSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  expiresAt: z.number().int(),
+  athleteId: z.string(),
+  updatedAt: z.string(),
+});
+export type StravaTokens = z.infer<typeof StravaTokensSchema>;

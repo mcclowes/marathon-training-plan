@@ -17,3 +17,8 @@ export {
   saveCompletions,
   toggleDayComplete,
 } from "./completions";
+export {
+  clearStravaTokens,
+  getStravaTokens,
+  saveStravaTokens,
+} from "./strava";

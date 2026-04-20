@@ -1,4 +1,5 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
+import { saveStravaTokens } from "@/lib/storage/strava";
 
 const STRAVA_AUTH_URL = "https://www.strava.com/oauth/authorize";
 const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
@@ -37,9 +38,6 @@ export const authConfig = {
     jwt({ token, account, profile }) {
       if (account && profile?.id != null) {
         token.athleteId = String(profile.id);
-        token.stravaAccessToken = account.access_token;
-        token.stravaRefreshToken = account.refresh_token;
-        token.stravaExpiresAt = account.expires_at;
       }
       return token;
     },
@@ -55,6 +53,31 @@ export const authConfig = {
         pathname.startsWith("/dashboard") || pathname.startsWith("/plans");
       if (!isProtected) return true;
       return !!auth?.user;
+    },
+  },
+  events: {
+    async signIn({ account, profile }) {
+      if (!account || !profile || profile.id == null) return;
+      if (
+        !account.access_token ||
+        !account.refresh_token ||
+        account.expires_at == null
+      ) {
+        return;
+      }
+      const athleteId = String(profile.id);
+      try {
+        await saveStravaTokens(athleteId, {
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+          expiresAt: account.expires_at,
+          athleteId,
+          updatedAt: new Date().toISOString(),
+        });
+      } catch (err) {
+        // Log but don't block sign-in — the user can reconnect later.
+        console.error("[auth] failed to persist Strava tokens", err);
+      }
     },
   },
   pages: { signIn: "/" },

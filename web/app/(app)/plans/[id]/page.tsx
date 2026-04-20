@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { PlanGrid } from "@/components/plan/PlanGrid";
+import { SyncStravaButton } from "@/components/plan/SyncStravaButton";
 import { requireUserId } from "@/lib/auth/session";
 import { getCompletions } from "@/lib/storage/completions";
 import { getPlan } from "@/lib/storage/plans";
+import { getStravaTokens } from "@/lib/storage/strava";
 import styles from "./page.module.scss";
 
 type Props = { params: Promise<{ id: string }> };
@@ -19,14 +21,16 @@ export default async function PlanPage({ params }: Props) {
   const { id } = await params;
   const userId = await requireUserId();
 
-  const [plan, completions] = await Promise.all([
+  const [plan, completions, tokens] = await Promise.all([
     getPlan(userId, id),
     getCompletions(userId, id),
+    getStravaTokens(userId),
   ]);
 
   if (!plan) notFound();
 
   const { planMeta, weeks } = plan;
+  const stravaConnected = !!tokens;
 
   return (
     <>
@@ -67,6 +71,8 @@ export default async function PlanPage({ params }: Props) {
           </div>
         </dl>
       </section>
+
+      {stravaConnected && <SyncStravaButton planId={id} />}
 
       <div className={styles.sectionTitle}>Schedule</div>
       <PlanGrid weeks={weeks} planId={id} completions={completions.completed} />

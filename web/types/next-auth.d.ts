@@ -15,8 +15,5 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     athleteId?: string;
-    stravaAccessToken?: string;
-    stravaRefreshToken?: string;
-    stravaExpiresAt?: number;
   }
 }
