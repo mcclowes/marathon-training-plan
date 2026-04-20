@@ -50,7 +50,9 @@ export const authConfig = {
       return session;
     },
     authorized({ auth, request }) {
-      const isProtected = request.nextUrl.pathname.startsWith("/dashboard");
+      const { pathname } = request.nextUrl;
+      const isProtected =
+        pathname.startsWith("/dashboard") || pathname.startsWith("/plans");
       if (!isProtected) return true;
       return !!auth?.user;
     },
