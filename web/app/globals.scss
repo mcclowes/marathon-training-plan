@@ -20,7 +20,10 @@ body {
   background: var(--c-bg);
   color: var(--c-text);
   line-height: 1.5;
-  overflow-x: hidden;
+  // `clip` instead of `hidden` — `hidden` makes iOS Safari treat body as a
+  // scroll container and mispositions the text-selection popover (Writing
+  // Tools, highlight menu) off the top of the viewport.
+  overflow-x: clip;
 }
 
 a {
