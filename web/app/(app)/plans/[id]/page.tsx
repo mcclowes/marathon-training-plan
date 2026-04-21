@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { PlanActionsMenu } from "@/components/plan/PlanActionsMenu";
-import { PlanGrid } from "@/components/plan/PlanGrid";
+import { PlanSummary } from "@/components/plan/PlanSummary";
 import { PlanTabs } from "@/components/plan/PlanTabs";
 import { requireUserId } from "@/lib/auth/session";
 import { getCompletions } from "@/lib/storage/completions";
@@ -35,46 +35,15 @@ export default async function PlanPage({ params }: Props) {
 
   return (
     <>
-      <section className={styles.hero}>
-        <div className={styles.topLine}>
-          <h1 className={styles.title}>{planMeta.raceDistance}</h1>
-          <span className={styles.raceDate}>{fmtDate(planMeta.raceDate)}</span>
+      <header className={styles.header}>
+        <div className={styles.kicker}>
+          {planMeta.raceDistance} · {fmtDate(planMeta.raceDate)}
         </div>
-
-        <dl className={styles.meta}>
-          <div className={styles.metaTile}>
-            <dt>Weeks</dt>
-            <dd>{planMeta.totalWeeks}</dd>
-          </div>
-          <div className={styles.metaTile}>
-            <dt>Blocks</dt>
-            <dd>{planMeta.planBlockCount}</dd>
-          </div>
-          <div className={styles.metaTile}>
-            <dt>Start</dt>
-            <dd>
-              {planMeta.startingDistance}
-              <small style={{ fontWeight: 400, color: "var(--c-text-dim)" }}>
-                {" "}
-                km/w
-              </small>
-            </dd>
-          </div>
-          <div className={styles.metaTile}>
-            <dt>Target</dt>
-            <dd>
-              {planMeta.targetDistance}
-              <small style={{ fontWeight: 400, color: "var(--c-text-dim)" }}>
-                {" "}
-                km/w
-              </small>
-            </dd>
-          </div>
-        </dl>
-      </section>
+        <h1 className={styles.title}>Plan summary</h1>
+      </header>
 
       <div className={styles.tabsRow}>
-        <PlanTabs planId={id} active="plan" />
+        <PlanTabs planId={id} active="summary" />
         <PlanActionsMenu
           planId={id}
           planLabel={`${planMeta.raceDistance} — ${fmtDate(planMeta.raceDate)}`}
@@ -85,8 +54,7 @@ export default async function PlanPage({ params }: Props) {
         />
       </div>
 
-      <div className={styles.sectionTitle}>Schedule</div>
-      <PlanGrid weeks={weeks} planId={id} completions={completions.completed} />
+      <PlanSummary plan={plan} planId={id} />
     </>
   );
 }
