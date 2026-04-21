@@ -14,7 +14,9 @@ vi.mock("./blob", () => ({
   deleteByKey: vi.fn(async (pathname: string) => {
     store.delete(pathname);
   }),
-  listUnderPrefix: vi.fn(async () => [] as string[]),
+  listUnderPrefix: vi.fn(async (prefix: string) =>
+    Array.from(store.keys()).filter((k) => k.startsWith(prefix)),
+  ),
 }));
 
 import {
@@ -86,5 +88,23 @@ describe("plans storage wrapper", () => {
     await savePlan("user-1", fakePlan("p1"));
     expect(await listPlans("user-2")).toEqual([]);
     expect(await getPlan("user-2", "p1")).toBeNull();
+  });
+
+  it("listPlans hides index entries whose plan blob is missing and heals the index", async () => {
+    await savePlan("user-1", fakePlan("p1"));
+    await savePlan("user-1", fakePlan("p2"));
+    // Simulate drift: plan blob gone (e.g. partial-failure on delete) but the
+    // index still lists it. The dashboard must not render a ghost plan.
+    store.delete("users/user-1/plans/p1.json");
+
+    const live = await listPlans("user-1");
+    expect(live.map((p) => p.planId)).toEqual(["p2"]);
+
+    // Self-heal: the index blob has been rewritten without the orphan, so a
+    // follow-up read doesn't need to re-check every time.
+    const indexAfter = store.get("users/user-1/plans-index.json") as {
+      plans: { planId: string }[];
+    };
+    expect(indexAfter.plans.map((p) => p.planId)).toEqual(["p2"]);
   });
 });
