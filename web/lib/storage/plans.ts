@@ -11,7 +11,7 @@
  *   - app/(app)/dashboard - uses listPlans
  * ---
  */
-import { deleteByKey, getJson, putJson } from "./blob";
+import { deleteByKey, getJson, listUnderPrefix, putJson } from "./blob";
 import { planIndexKey, planKey } from "./keys";
 import {
   PlanIndexSchema,
@@ -35,7 +35,20 @@ function toIndexEntry(plan: StoredPlan): PlanIndexEntry {
 
 export async function listPlans(userId: string): Promise<PlanIndexEntry[]> {
   const index = await getJson(planIndexKey(userId), PlanIndexSchema);
-  return index?.plans ?? [];
+  if (!index) return [];
+
+  // Guard against index ↔ blob drift (e.g. delete partial-failure, blob CDN
+  // propagation, legacy/migrated state): only return entries whose plan blob
+  // still exists, and rewrite the index if we found orphans so subsequent
+  // reads skip the re-check.
+  const existing = new Set(await listUnderPrefix(`users/${userId}/plans/`));
+  const live = index.plans.filter((p) =>
+    existing.has(planKey(userId, p.planId)),
+  );
+  if (live.length !== index.plans.length) {
+    await putJson(planIndexKey(userId), { plans: live });
+  }
+  return live;
 }
 
 export async function getPlan(
