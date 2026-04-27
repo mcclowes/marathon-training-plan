@@ -67,18 +67,33 @@ type FocusShare = {
   share: number;
 };
 
+const HARD_FOCUS_AREAS = new Set(["Speed", "Speed Endurance", "Tempo"]);
+
 function focusMix(plan: StoredPlan): FocusShare[] {
   const totals = new Map<string, { key: ReturnType<typeof focusKeyOf>; km: number }>();
   let grand = 0;
+
+  function add(focusArea: string, km: number) {
+    grand += km;
+    const key = focusKeyOf(focusArea);
+    const existing = totals.get(focusArea);
+    if (existing) existing.km += km;
+    else totals.set(focusArea, { key, km });
+  }
+
   for (const day of plan.days) {
     if (!day.totalDistance) continue;
-    const key = focusKeyOf(day.focusArea);
-    const km = day.totalDistance;
-    grand += km;
-    const existing = totals.get(day.focusArea);
-    if (existing) existing.km += km;
-    else totals.set(day.focusArea, { key, km });
+    if (HARD_FOCUS_AREAS.has(day.focusArea)) {
+      // Only count main-set work as hard; warmup+cooldown goes to Base
+      const wcKm = day.warmUp + day.warmDown;
+      const workKm = Math.max(0, day.totalDistance - wcKm);
+      add(day.focusArea, workKm);
+      if (wcKm > 0) add("Base", wcKm);
+    } else {
+      add(day.focusArea, day.totalDistance);
+    }
   }
+
   if (grand <= 0) return [];
   return Array.from(totals.entries())
     .map(([label, { key, km }]) => ({

@@ -23,7 +23,11 @@ export function calculateDistances(
     Math.min(tuning.longRunCapKm, total * tuning.longRunFraction),
   );
   const intensityWeeklyKm = Math.round(total * tuning.intensityFraction);
-  const baseWeeklyKm = Math.round(total - longRunKm - intensityWeeklyKm);
+  // intensityFraction targets work km only. Each of the 2 intensity sessions
+  // adds 2.5km warmup + 2.5km cooldown on top — deduct that overhead so base
+  // stays accurate and total weekly km hits the planned target.
+  const intensityOverheadKm = 2 * (2.5 + 2.5);
+  const baseWeeklyKm = Math.round(Math.max(0, total - longRunKm - intensityWeeklyKm - intensityOverheadKm));
 
   const intensityPerSessionMeters = Math.round((intensityWeeklyKm * 1000) / 2);
 

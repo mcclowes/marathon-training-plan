@@ -20,10 +20,11 @@ describe("distanceAllocation", () => {
     expect(d.intensityWeeklyKm).toBe(Math.round(80 * 0.2));
   });
 
-  it("base = total - longRun - intensity", () => {
+  it("base = total - longRun - intensity work - warmup/cooldown overhead", () => {
     const km = 80;
     const d = calculateDistances(km, 4);
-    expect(d.baseWeeklyKm).toBe(km - d.longRunKm - d.intensityWeeklyKm);
+    // intensityFraction is work-only; 2 sessions × 5km warmup+cooldown overhead deducted from base
+    expect(d.baseWeeklyKm).toBe(km - d.longRunKm - d.intensityWeeklyKm - 10);
   });
 
   it("5-session week: wednesdayBaseMileage > 0", () => {

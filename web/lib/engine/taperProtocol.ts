@@ -21,10 +21,19 @@ export function isTaperDay(
   return dayIndex >= maxDayCount - tuning.taperDays;
 }
 
+function scaleKm(km: number, factor: number): number {
+  return Math.round(km * factor * 10) / 10;
+}
+
+function scaleMetres(m: number, factor: number): number {
+  return Math.round((m * factor) / 100) * 100;
+}
+
 export function getTaperSession(
   dayIndex: number,
   maxDayCount: number,
   prevFocusArea: string,
+  preTaperWeeklyMileage = 85,
 ): TaperSession | null {
   if (prevFocusArea === "Long Run") {
     return {
@@ -55,6 +64,12 @@ export function getTaperSession(
     };
   }
 
+  // Days 7–17: scale volumes down 1% per km under 85 km/week pre-taper
+  const scaleFactor =
+    offset >= 7 && preTaperWeeklyMileage < 85
+      ? Math.max(0, 1 - (85 - preTaperWeeklyMileage) / 100)
+      : 1;
+
   switch (offset) {
     case 17:
       return null;
@@ -65,9 +80,9 @@ export function getTaperSession(
         sessionSummary: "Easy Running",
         sessionDescription:
           "Warm Up with drills then 5km easy running, easy warm down",
-        totalDistance: 10,
-        warmUp: 2.5,
-        warmDown: 2.5,
+        totalDistance: scaleKm(10, scaleFactor),
+        warmUp: scaleKm(2.5, scaleFactor),
+        warmDown: scaleKm(2.5, scaleFactor),
         recoveries: "N/A",
         isTaper: true,
       };
@@ -78,9 +93,9 @@ export function getTaperSession(
         sessionSummary: "Steady running, practice finishing strong",
         sessionDescription:
           "Warm Up with drills then 24km easy running, easy warm down",
-        totalDistance: 30,
-        warmUp: 3,
-        warmDown: 3,
+        totalDistance: scaleKm(30, scaleFactor),
+        warmUp: scaleKm(3, scaleFactor),
+        warmDown: scaleKm(3, scaleFactor),
         recoveries: "N/A",
         isTaper: true,
       };
@@ -90,11 +105,11 @@ export function getTaperSession(
         focusArea: "Speed",
         sessionSummary: "Taper Speed Session",
         sessionDescription: "SE session - sharp intensity, reduced volume",
-        totalDistance: 10,
-        warmUp: 2.5,
-        warmDown: 2.5,
+        totalDistance: scaleKm(10, scaleFactor),
+        warmUp: scaleKm(2.5, scaleFactor),
+        warmDown: scaleKm(2.5, scaleFactor),
         recoveries: "",
-        intensityMileage: 10000,
+        intensityMileage: scaleMetres(10000, scaleFactor),
         sessionType: "SE",
         useFinalSelection: true,
         isTaper: true,
@@ -105,11 +120,11 @@ export function getTaperSession(
         focusArea: "Speed",
         sessionSummary: "Taper Tempo Session",
         sessionDescription: "Tempo session - maintain sharpness",
-        totalDistance: 10,
-        warmUp: 2.5,
-        warmDown: 2.5,
+        totalDistance: scaleKm(10, scaleFactor),
+        warmUp: scaleKm(2.5, scaleFactor),
+        warmDown: scaleKm(2.5, scaleFactor),
         recoveries: "",
-        intensityMileage: 10000,
+        intensityMileage: scaleMetres(10000, scaleFactor),
         sessionType: "Tempo",
         useFinalSelection: true,
         isTaper: true,
@@ -121,9 +136,9 @@ export function getTaperSession(
         sessionSummary: "Easy Running",
         sessionDescription:
           "Warm Up with drills then 5km easy running, easy warm down",
-        totalDistance: 10,
-        warmUp: 2.5,
-        warmDown: 2.5,
+        totalDistance: scaleKm(10, scaleFactor),
+        warmUp: scaleKm(2.5, scaleFactor),
+        warmDown: scaleKm(2.5, scaleFactor),
         recoveries: "N/A",
         isTaper: true,
       };
@@ -134,9 +149,9 @@ export function getTaperSession(
         sessionSummary: "Steady running, practice finishing strong",
         sessionDescription:
           "Warm Up with drills then 15km steady running, easy warm down",
-        totalDistance: 21,
-        warmUp: 3,
-        warmDown: 3,
+        totalDistance: scaleKm(21, scaleFactor),
+        warmUp: scaleKm(3, scaleFactor),
+        warmDown: scaleKm(3, scaleFactor),
         recoveries: "N/A",
         isTaper: true,
       };

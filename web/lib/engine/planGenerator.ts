@@ -112,6 +112,11 @@ export function generateTrainingPlan(
     tuning,
   );
 
+  const firstTaperWeekIdx = Math.floor((taperStartDayIndex - 1) / 7);
+  const preTaperWeeklyMileage =
+    weeklyMileageData[Math.max(0, firstTaperWeekIdx - 1)]?.weekMileage ??
+    startingDistance;
+
   const { paceIndex: startPaceIndex, headerValue } = findPaceIndex(
     config,
     raceDistance,
@@ -175,6 +180,7 @@ export function generateTrainingPlan(
         globalDayIndex + 1,
         maxDayCount,
         prevFocus,
+        preTaperWeeklyMileage,
       );
 
       if (taperSess) {
