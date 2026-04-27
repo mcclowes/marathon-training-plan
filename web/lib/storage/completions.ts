@@ -1,0 +1,53 @@
+/**
+ * ---
+ * purpose: Per-plan day-completion tracking. Stored at users/{userId}/completions/{planId}.json as a date-string → ISO-timestamp map. Toggle mutates in place.
+ * outputs:
+ *   - getCompletions / saveCompletions / toggleDayComplete
+ * related:
+ *   - ./blob.ts - underlying I/O
+ *   - ./schemas.ts - CompletionsSchema
+ *   - ../progress/buildProgressView.ts - consumer of completions
+ *   - app/actions/completions.ts - server action caller
+ * ---
+ */
+import { getJson, putJson } from "./blob";
+import { completionsKey } from "./keys";
+import { CompletionsSchema, type Completions } from "./schemas";
+
+function emptyCompletions(planId: string): Completions {
+  return { planId, completed: {} };
+}
+
+export async function getCompletions(
+  userId: string,
+  planId: string,
+): Promise<Completions> {
+  const stored = await getJson(completionsKey(userId, planId), CompletionsSchema);
+  return stored ?? emptyCompletions(planId);
+}
+
+export async function saveCompletions(
+  userId: string,
+  completions: Completions,
+): Promise<void> {
+  await putJson(completionsKey(userId, completions.planId), completions);
+}
+
+export async function toggleDayComplete(
+  userId: string,
+  planId: string,
+  dateStr: string,
+): Promise<Completions> {
+  const current = await getCompletions(userId, planId);
+  const next: Completions = {
+    planId,
+    completed: { ...current.completed },
+  };
+  if (next.completed[dateStr]) {
+    delete next.completed[dateStr];
+  } else {
+    next.completed[dateStr] = new Date().toISOString();
+  }
+  await saveCompletions(userId, next);
+  return next;
+}

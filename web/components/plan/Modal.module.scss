@@ -1,0 +1,56 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 5, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--sp-3);
+  animation: fadeIn 180ms ease;
+
+  @media (min-width: 640px) {
+    align-items: center;
+  }
+}
+
+.box {
+  background: var(--c-bg-card);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  max-width: 520px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 250ms ease;
+
+  @media (min-width: 640px) {
+    border-radius: var(--r-lg);
+  }
+}
+
+.close {
+  position: sticky;
+  top: 0;
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 0;
+  margin-left: auto;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: var(--c-text);
+  }
+}

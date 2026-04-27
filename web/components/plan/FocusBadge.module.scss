@@ -1,0 +1,49 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.rest {
+  --bg: var(--c-rest-bg);
+  --fg: var(--c-rest);
+}
+.recovery {
+  --bg: var(--c-recovery-bg);
+  --fg: var(--c-recovery);
+}
+.speed {
+  --bg: var(--c-speed-bg);
+  --fg: var(--c-speed);
+}
+.se {
+  --bg: var(--c-se-bg);
+  --fg: var(--c-se);
+}
+.tempo {
+  --bg: var(--c-tempo-bg);
+  --fg: var(--c-tempo);
+}
+.base {
+  --bg: var(--c-base-bg);
+  --fg: var(--c-base);
+}
+.longrun {
+  --bg: var(--c-longrun-bg);
+  --fg: var(--c-longrun);
+}
+.race {
+  --bg: var(--c-race-bg);
+  --fg: var(--c-race);
+}
+.taper {
+  --bg: var(--c-taper-bg);
+  --fg: var(--c-taper);
+}

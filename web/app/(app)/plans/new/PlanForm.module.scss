@@ -1,0 +1,103 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--c-text-muted);
+}
+
+.hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text-dim);
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-bg-input);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-base);
+  transition: border-color var(--tr-fast), box-shadow var(--tr-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--c-border-focus);
+    box-shadow: 0 0 0 3px var(--c-accent-glow);
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.toggle {
+  display: flex;
+  background: var(--c-bg-input);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.toggleOption {
+  flex: 1;
+  padding: var(--sp-3);
+  text-align: center;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--c-text-muted);
+  transition: background var(--tr-fast), color var(--tr-fast);
+
+  &.active {
+    background: var(--c-accent);
+    color: #fff;
+  }
+}
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-6);
+  border-radius: var(--r-md);
+  background: var(--c-accent);
+  color: #fff;
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-base);
+  box-shadow: 0 2px 8px rgba(90, 122, 58, 0.25);
+  transition: background var(--tr-fast), transform var(--tr-fast);
+
+  &:hover:not(:disabled) {
+    background: var(--c-accent-hover);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.error {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+}
