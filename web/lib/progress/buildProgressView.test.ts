@@ -82,6 +82,7 @@ function mkPlan(): StoredPlan {
       raceDistance: "Marathon",
       startPaceIndex: 0,
       generatedAt: "2026-01-01T00:00:00Z",
+      objective: "performance" as const,
     },
     days: [...wk1.days, ...wk2.days],
     weeks: [wk1, wk2],

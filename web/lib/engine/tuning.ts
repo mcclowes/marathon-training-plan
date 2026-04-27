@@ -64,8 +64,8 @@ export const DEFAULT_TUNING: TuningParams = {
 
   weeklyGrowthCap: 0.1,
   perWeekGrowthCeiling: 1.1,
-  deload1Factor: 0.8,
-  deload2Factor: 0.7,
+  deload1Factor: 0.9,
+  deload2Factor: 0.8,
   peakWeeksPerBlock: 2,
 
   blockSizes: [8, 10, 12],

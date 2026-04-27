@@ -9,7 +9,7 @@
  *   - ./tuning.ts - weeklyGrowthCap / perWeekGrowthCeiling / peakWeeksPerBlock / deload1Factor / deload2Factor
  * ---
  */
-import type { Block, WeeklyMileage } from "./types";
+import type { Block, TrainingObjective, WeeklyMileage } from "./types";
 import { DEFAULT_TUNING, type TuningParams } from "./tuning";
 
 export interface GrowthRateParams {
@@ -65,6 +65,7 @@ export function progressWeeklyMileageByBlocks(
   userTargetMaxMileage: number,
   blocks: Pick<Block, "blockIndex" | "blockWeeks" | "sessionWeeks" | "deloadWeeks">[],
   tuning: TuningParams = DEFAULT_TUNING,
+  objective: TrainingObjective = "performance",
 ): WeeklyMileage[] {
   if (!blocks || blocks.length === 0) return [];
 
@@ -73,17 +74,22 @@ export function progressWeeklyMileageByBlocks(
   const peakWeeks = tuning.peakWeeksPerBlock;
   const ceiling = tuning.perWeekGrowthCeiling;
   const maxRate = tuning.weeklyGrowthCap;
+  const blockCount = blocks.length;
+  const isFinish = objective === "finish";
 
-  for (let bi = 0; bi < blocks.length; bi++) {
+  for (let bi = 0; bi < blockCount; bi++) {
     const block = blocks[bi];
     const rampWeeks = block.sessionWeeks - peakWeeks;
 
+    // "finish": interpolate blockMax so only the final block reaches userTargetMaxMileage.
+    // "performance": every block pushes as high as it can (original behaviour).
+    const blockCap = isFinish
+      ? startMileage + (userTargetMaxMileage - startMileage) * (bi + 1) / blockCount
+      : userTargetMaxMileage;
+
     const achievableMax =
       rampWeeks > 0 ? currentMileage * Math.pow(ceiling, rampWeeks) : currentMileage;
-    const blockMax = Math.min(
-      userTargetMaxMileage,
-      Math.max(currentMileage, achievableMax),
-    );
+    const blockMax = Math.min(blockCap, Math.max(currentMileage, achievableMax));
 
     let r = 0;
     if (rampWeeks > 0 && currentMileage > 0 && blockMax > currentMileage) {
@@ -142,7 +148,20 @@ export function progressWeeklyMileageByBlocks(
       blockMaxMileage: roundedPeak,
     });
 
-    currentMileage = deload2;
+    // Determine start mileage for the next block.
+    // If the next block can reach userTargetMaxMileage, start more conservatively (80%);
+    // otherwise give a higher base (90%) to preserve fitness across the deload.
+    if (bi < blockCount - 1) {
+      const nextBlock = blocks[bi + 1];
+      const nextRampWeeks = nextBlock.sessionWeeks - peakWeeks;
+      const candidateStart = roundedPeak * 0.9;
+      const nextAchievable =
+        nextRampWeeks > 0 ? candidateStart * Math.pow(ceiling, nextRampWeeks) : candidateStart;
+      const nextWillHitCap = nextAchievable >= userTargetMaxMileage;
+      currentMileage = nextWillHitCap ? roundedPeak * 0.8 : candidateStart;
+    } else {
+      currentMileage = deload2;
+    }
   }
 
   return weeklyData;

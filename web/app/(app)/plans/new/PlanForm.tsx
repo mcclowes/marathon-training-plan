@@ -6,12 +6,14 @@ import { generatePlanAction } from "@/app/actions/plans";
 import styles from "./PlanForm.module.scss";
 
 type Style = "Endurance" | "Speedster";
+type Objective = "performance" | "finish";
 
 export function PlanForm({ minRaceDate }: { minRaceDate: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [style, setStyle] = useState<Style>("Endurance");
+  const [objective, setObjective] = useState<Objective>("performance");
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,6 +29,7 @@ export function PlanForm({ minRaceDate }: { minRaceDate: string }) {
       targetPace: String(fd.get("targetPace")),
       raceDistance: "Marathon",
       style,
+      objective,
     };
 
     startTransition(async () => {
@@ -156,6 +159,29 @@ export function PlanForm({ minRaceDate }: { minRaceDate: string }) {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className={styles.group}>
+        <span className={styles.label}>Objective</span>
+        <div className={styles.toggle} role="tablist">
+          {(["performance", "finish"] as const).map((o) => (
+            <button
+              key={o}
+              type="button"
+              role="tab"
+              aria-selected={objective === o}
+              className={`${styles.toggleOption} ${objective === o ? styles.active : ""}`}
+              onClick={() => setObjective(o)}
+            >
+              {o === "performance" ? "Performance" : "Just finish"}
+            </button>
+          ))}
+        </div>
+        <span className={styles.hint}>
+          {objective === "performance"
+            ? "Builds to peak mileage aggressively each block."
+            : "Builds slowly, peaking only in the final block."}
+        </span>
       </div>
 
       {error && <div className={styles.error}>{error}</div>}

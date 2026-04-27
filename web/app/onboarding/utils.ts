@@ -23,6 +23,7 @@ export type OnboardingAnswers = {
   volume?: number;
   recent?: RecentRun;
   goal?: GoalChoice;
+  objective?: "performance" | "finish";
   days?: 3 | 4 | 5;
 };
 

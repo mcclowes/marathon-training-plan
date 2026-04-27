@@ -176,6 +176,8 @@ export interface Config {
 
 export type PaceStyle = "Endurance" | "Speedster";
 
+export type TrainingObjective = "performance" | "finish";
+
 export interface PaceData {
   speedPaces: PaceRow[] | null;
   sePaces: PaceRow[] | null;
@@ -227,6 +229,7 @@ export interface PlanWeek {
   totalMileage: number;
   blockNumber: number;
   isTaper: boolean;
+  isDeload: boolean;
 }
 
 export interface PlanMeta {
@@ -235,7 +238,7 @@ export interface PlanMeta {
   totalWeeks: number;
   planBlockCount: number;
   planBlockLength: number;
-  blocks: { blockWeeks: number; sessionWeeks: number }[];
+  blocks: { blockWeeks: number; sessionWeeks: number; deloadWeeks: number }[];
   taperStartDayIndex: number;
   slackDays: number;
   startingDistance: number;
@@ -244,6 +247,7 @@ export interface PlanMeta {
   raceDistance: string;
   startPaceIndex: number;
   generatedAt: string;
+  objective: TrainingObjective;
 }
 
 export interface GeneratedPlan {
@@ -261,6 +265,7 @@ export interface GeneratePlanInput {
   currentPace: string;
   targetPace: string;
   style?: PaceStyle;
+  objective?: TrainingObjective;
 }
 
 export interface DataStore {

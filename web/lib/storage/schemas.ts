@@ -67,6 +67,7 @@ export const PlanMetaSchema = z
     raceDistance: z.string(),
     startPaceIndex: z.number(),
     generatedAt: z.string(),
+    objective: z.enum(["performance", "finish"]).default("performance"),
   })
   .passthrough();
 

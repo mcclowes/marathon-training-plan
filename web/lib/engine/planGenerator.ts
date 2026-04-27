@@ -84,6 +84,7 @@ export function generateTrainingPlan(
     currentPace,
     targetPace,
     style = "Endurance",
+    objective = "performance",
   } = input;
 
   const { sessionTemplates, paceTables, config } = dataStore;
@@ -110,7 +111,12 @@ export function generateTrainingPlan(
     targetTotalDistance,
     blocks,
     tuning,
+    objective,
   );
+
+  // Pre-build week → isDeload lookup (weekNumber is 1-based, weeklyMileageData is 0-based)
+  const weekDeloadMap = new Map<number, boolean>();
+  weeklyMileageData.forEach((w, i) => { weekDeloadMap.set(i + 1, w.isDeload); });
 
   const { paceIndex: startPaceIndex, headerValue } = findPaceIndex(
     config,
@@ -392,6 +398,7 @@ export function generateTrainingPlan(
         totalMileage: 0,
         blockNumber: day.blockNumber,
         isTaper: false,
+        isDeload: weekDeloadMap.get(wn) ?? false,
       };
     }
     currentWeek.days.push(day);
@@ -413,6 +420,7 @@ export function generateTrainingPlan(
     blocks: blocks.map((b) => ({
       blockWeeks: b.blockWeeks,
       sessionWeeks: b.sessionWeeks,
+      deloadWeeks: b.deloadWeeks,
     })),
     taperStartDayIndex,
     slackDays: blockInfo.slackDays,
@@ -422,6 +430,7 @@ export function generateTrainingPlan(
     raceDistance,
     startPaceIndex,
     generatedAt: new Date().toISOString(),
+    objective,
   };
 
   return { planMeta, days, weeks };

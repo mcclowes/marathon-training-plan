@@ -36,3 +36,6 @@ node_modules/
 
 # Local-only config (Claude Code per-user settings, .env.local, etc.)
 *.local*
+
+# Simulation generated outputs
+web/simulations/outputs/

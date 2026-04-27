@@ -77,7 +77,7 @@ export function StepWelcome({ onNext }: { onNext: () => void }) {
       </h1>
       <p className={styles.sub}>
         A marathon is a long way. We&rsquo;ll take it a week at a time, starting
-        with nine small questions.
+        with ten small questions.
       </p>
       <div className={styles.distanceRibbon}>
         <span className={styles.ribbonStart}>0</span>
@@ -532,7 +532,64 @@ export function StepGoal({
   );
 }
 
-/* ── 8. Days ───────────────────────────────────────────────────────────── */
+/* ── 8. Objective ──────────────────────────────────────────────────────── */
+export function StepObjective({
+  onNext,
+  onBack,
+  value,
+  onChange,
+}: NavProps & {
+  value?: "performance" | "finish";
+  onChange: (v: "performance" | "finish") => void;
+}) {
+  const opts: { id: "performance" | "finish"; title: string; sub: string; emoji: string }[] = [
+    {
+      id: "performance",
+      title: "Performance",
+      sub: "Build to peak mileage fast. Every block pushes the ceiling.",
+      emoji: "⚡",
+    },
+    {
+      id: "finish",
+      title: "Just finish",
+      sub: "Build slowly, reaching peak only in the final block.",
+      emoji: "🏁",
+    },
+  ];
+  return (
+    <div className={styles.col}>
+      <Eyebrow>Step 8 · Approach</Eyebrow>
+      <h2 className={styles.h2}>How do you want to train?</h2>
+      <Hint>This shapes how aggressively your weekly mileage builds.</Hint>
+      <div className={styles.tapStack}>
+        {opts.map((o, i) => (
+          <button
+            key={o.id}
+            type="button"
+            className={`${styles.tapCard} ${value === o.id ? styles.tapCardOn : ""}`}
+            style={{ animationDelay: `${i * 70}ms` }}
+            onClick={() => {
+              onChange(o.id);
+              setTimeout(onNext, 180);
+            }}
+          >
+            <span className={styles.tapEmoji}>{o.emoji}</span>
+            <span className={styles.tapBody}>
+              <span className={styles.tapTitle}>{o.title}</span>
+              <span className={styles.tapSub}>{o.sub}</span>
+            </span>
+            <span className={styles.tapChevron} aria-hidden>
+              →
+            </span>
+          </button>
+        ))}
+      </div>
+      <SecondaryButton onClick={onBack}>Back</SecondaryButton>
+    </div>
+  );
+}
+
+/* ── 9. Days ───────────────────────────────────────────────────────────── */
 export function StepDays({
   onNext,
   onBack,
@@ -546,7 +603,7 @@ export function StepDays({
   ];
   return (
     <div className={styles.col}>
-      <Eyebrow>Step 8 · Schedule</Eyebrow>
+      <Eyebrow>Step 9 · Schedule</Eyebrow>
       <h2 className={styles.h2}>How many running days per week?</h2>
       <Hint>Be honest about your week — consistency beats ambition.</Hint>
       <div className={styles.daysRow}>
@@ -606,12 +663,13 @@ export function StepReview({
     ["Running now", answers.volume != null ? `${answers.volume} km / week` : "—"],
     ["Fitness", estimateSec ? `Marathon ~${formatHoursRough(estimateSec)}` : "—"],
     ["Goal", goalLabel],
+    ["Approach", answers.objective === "finish" ? "Just finish" : "Performance"],
     ["Days / week", answers.days ? String(answers.days) : "—"],
   ];
 
   return (
     <div className={styles.col}>
-      <Eyebrow>Step 9 · Review</Eyebrow>
+      <Eyebrow>Step 10 · Review</Eyebrow>
       <h2 className={styles.h2}>Here&rsquo;s what we heard.</h2>
       <Hint>Look good? We&rsquo;ll build a block-periodised plan from this.</Hint>
 

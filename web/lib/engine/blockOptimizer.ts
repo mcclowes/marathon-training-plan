@@ -42,7 +42,7 @@ export function isUniform(lengths: number[]): boolean {
   return lengths.length > 0 && lengths.every((l) => l === lengths[0]);
 }
 
-function scoreCandidate(
+export function scoreCandidate(
   lengths: number[],
   daysUntilRace: number,
   tuning: TuningParams,
@@ -71,7 +71,7 @@ function scoreCandidate(
   return score;
 }
 
-function generateCandidates(count: number, sizes: readonly number[]): number[][] {
+export function generateCandidates(count: number, sizes: readonly number[]): number[][] {
   if (count === 0) return [[]];
   const shorter = generateCandidates(count - 1, sizes);
   const results: number[][] = [];
@@ -139,5 +139,94 @@ export function optimizeBlocks(
     planBlockLength: Math.max(...bestLengths),
     planType: "Candidate",
     startCount: slackDays,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Block layout trace (for plan_traces.json)
+// ---------------------------------------------------------------------------
+
+export interface BlockCandidateTrace {
+  signature: string;
+  score: number;
+  slack: number;
+  isPyramidal: boolean;
+  isUniform: boolean;
+}
+
+export interface BlockLayoutTrace {
+  chosenSignature: string;
+  chosenScore: number;
+  blockBoundaryWeeks: number[];
+  totalWeeksAvailable: number;
+  taperWeeksReserved: number;
+  remainingForBlocks: number;
+  rule: string;
+  allCandidates: BlockCandidateTrace[];
+}
+
+export function getBlockLayoutTrace(
+  maxDayCount: number,
+  tuning: TuningParams = DEFAULT_TUNING,
+): BlockLayoutTrace {
+  const daysUntilRace = maxDayCount;
+  const taperWeeksReserved = Math.ceil(tuning.taperDays / 7);
+  const totalWeeksAvailable = Math.floor(daysUntilRace / 7);
+
+  const candidates: BlockCandidateTrace[] = [];
+  let bestLengths: number[] | null = null;
+  let bestScore = -Infinity;
+
+  for (let count = 1; count <= 5; count++) {
+    for (const lengths of generateCandidates(count, tuning.blockSizes)) {
+      const totalDays = lengths.reduce((s, l) => s + l * 7, 0);
+      if (totalDays > daysUntilRace) continue;
+      if (totalDays < daysUntilRace - 28) continue;
+      if (!isPyramidal(lengths) && !isUniform(lengths)) continue;
+
+      const slack = daysUntilRace - totalDays;
+      const score = scoreCandidate(lengths, daysUntilRace, tuning);
+      candidates.push({
+        signature: lengths.join("-"),
+        score: Math.round(score * 10) / 10,
+        slack,
+        isPyramidal: isPyramidal(lengths),
+        isUniform: isUniform(lengths),
+      });
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestLengths = lengths;
+      }
+    }
+  }
+
+  if (!bestLengths) bestLengths = [tuning.blockSizes[0] ?? 8];
+
+  const chosenSig = bestLengths.join("-");
+  candidates.sort((a, b) => b.score - a.score);
+
+  // Block boundary weeks (first week of each block after the first)
+  let cumWeeks = 0;
+  const boundaryWeeks: number[] = [];
+  for (let i = 0; i < bestLengths.length - 1; i++) {
+    cumWeeks += bestLengths[i]!;
+    boundaryWeeks.push(cumWeeks + 1);
+  }
+
+  const shape = bestLengths.length === 1
+    ? "single-block"
+    : isPyramidal(bestLengths) ? "pyramidal" : "uniform";
+  const rule = `blockOptimizer.ts:optimizeBlocks @ daysUntilRace=${daysUntilRace} → ${bestLengths.length}-block ${shape} layout [${chosenSig}], slack=${daysUntilRace - bestLengths.reduce((s, l) => s + l * 7, 0)}d`;
+
+  return {
+    chosenSignature: chosenSig,
+    chosenScore: Math.round(bestScore * 10) / 10,
+    blockBoundaryWeeks: boundaryWeeks,
+    totalWeeksAvailable,
+    taperWeeksReserved,
+    remainingForBlocks: totalWeeksAvailable - taperWeeksReserved,
+    rule,
+    allCandidates: candidates,
   };
 }

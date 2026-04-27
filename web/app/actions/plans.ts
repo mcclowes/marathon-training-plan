@@ -17,6 +17,7 @@ const GeneratePlanInputSchema = z.object({
   currentPace: z.string().regex(/^\d{2}:\d{2}:\d{2}$/),
   targetPace: z.string().regex(/^\d{2}:\d{2}:\d{2}$/),
   style: z.enum(["Endurance", "Speedster"]).default("Endurance"),
+  objective: z.enum(["performance", "finish"]).default("performance"),
 });
 
 export type GeneratePlanResult =

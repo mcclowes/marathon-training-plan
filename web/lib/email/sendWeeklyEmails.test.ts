@@ -94,6 +94,7 @@ function makePlan(planId: string, raceDate: string): StoredPlan {
       raceDistance: "Marathon",
       startPaceIndex: 8,
       generatedAt: "2026-04-01T00:00:00.000Z",
+      objective: "performance" as const,
     },
     days,
     weeks: [

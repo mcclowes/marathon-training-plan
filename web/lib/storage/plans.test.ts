@@ -45,6 +45,7 @@ function fakePlan(planId: string, raceDate = "2026-06-01"): StoredPlan {
       raceDistance: "Marathon",
       startPaceIndex: 8,
       generatedAt: "2026-04-19T00:00:00.000Z",
+      objective: "performance" as const,
     },
     days: [],
     weeks: [],

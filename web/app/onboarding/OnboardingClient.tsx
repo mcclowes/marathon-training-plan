@@ -12,6 +12,7 @@ import {
   StepGenerating,
   StepGoal,
   StepMotivation,
+  StepObjective,
   StepRace,
   StepRecent,
   StepReview,
@@ -35,13 +36,14 @@ const STEPS = [
   "volume",
   "recent",
   "goal",
+  "objective",
   "days",
   "review",
   "generating",
   "done",
 ] as const;
 type StepId = (typeof STEPS)[number];
-const PROGRESS_TOTAL = 9;
+const PROGRESS_TOTAL = 10;
 
 const STORAGE_KEY = "watto.onboarding.v1";
 
@@ -137,6 +139,9 @@ export function OnboardingClient({ minRaceDate }: { minRaceDate: string }) {
         ? "Endurance"
         : "Speedster";
 
+    const objective =
+      answers.objective ?? (answers.goal.type === "finish" ? "finish" : "performance");
+
     const input = {
       raceDate: answers.raceDate,
       sessionsPerWeek: answers.days,
@@ -146,6 +151,7 @@ export function OnboardingClient({ minRaceDate }: { minRaceDate: string }) {
       targetPace: formatHMS(targetSec),
       raceDistance: "Marathon",
       style,
+      objective,
     } as const;
 
     startTransition(async () => {
@@ -228,6 +234,14 @@ export function OnboardingClient({ minRaceDate }: { minRaceDate: string }) {
             value={answers.goal}
             estimateSec={estimateSec ?? null}
             onChange={(v) => update("goal", v)}
+          />
+        );
+      case "objective":
+        return (
+          <StepObjective
+            {...common}
+            value={answers.objective}
+            onChange={(v) => update("objective", v)}
           />
         );
       case "days":
